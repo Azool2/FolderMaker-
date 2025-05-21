@@ -20,6 +20,7 @@ def create_folders():
     # Prüft, ob der Hauptordner bereits existiert
     if os.path.exists(main_folder):
         messagebox.showinfo("Hinweis", f"Ordner '{folder_name}' bereits vorhanden!")
+        root.destroy()
         return
     # Liste der Unterordner, die erstellt werden sollen
     subfolders = ["Footage", "Export", "Project", "_ORGA"]
@@ -56,14 +57,32 @@ def create_folders():
         for sub in ["Drehbuch", "Excel Tabelen"]:
             os.makedirs(os.path.join(documents_path, sub), exist_ok=True)
         # Zeigt eine Erfolgsmeldung an, wenn alles geklappt hat
-        # messagebox.showinfo("Erfolg", f"Ordner '{folder_name}' wurde erstellt.")
+        messagebox.showinfo("Erfolg", f"Ordner '{folder_name}' wurde erstellt.")
+        root.destroy()
     except Exception as e:
         # Zeigt eine Fehlermeldung an, falls etwas schiefgeht
         messagebox.showerror("Fehler", str(e))
+        root.destroy()
 
 # GUI erstellen
 root = tk.Tk()  # Erstellt das Hauptfenster der Anwendung
+root.overrideredirect(True)  # Entfernt die Fensterdekoration (nur Dialog sichtbar)
 root.title("Ordnerstruktur erstellen")  # Setzt den Fenstertitel
+
+# Fenstergröße festlegen (z.B. 300x120)
+window_width = 300
+window_height = 120
+
+# Bildschirmgröße ermitteln
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# Position berechnen
+x = int((screen_width / 2) - (window_width / 2))
+y = int((screen_height / 2) - (window_height / 2))
+
+# Fenster positionieren
+root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
 # Erstellt ein Label (Textfeld) für die Eingabeaufforderung
 tk.Label(root, text="Blocknummer eingeben:").pack(pady=5)
@@ -73,6 +92,8 @@ entry.pack(pady=5)
 entry.focus_set()
 # Bindet die Enter-Taste an die Funktion create_folders
 entry.bind('<Return>', lambda event: create_folders())
+# Bindet die Escape-Taste an das Beenden der Anwendung
+root.bind('<Escape>', lambda event: root.destroy())
 
 # Erstellt einen Button, der beim Klicken die Funktion create_folders ausführt
 tk.Button(root, text="Ordner erstellen", command=create_folders).pack(pady=10)
