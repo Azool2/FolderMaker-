@@ -5,25 +5,33 @@ from tkinter import messagebox  # Importiert das Modul für Popup-Nachrichtenfen
 def create_folders():
     # Holt den eingegebenen Wert aus dem Eingabefeld (Blocknummer)
     block_number = entry.get()
+    pfad = pfad_var.get()
     # Prüft, ob eine Blocknummer eingegeben wurde
     if not block_number:
         # Zeigt eine Warnung an, wenn das Feld leer ist
         messagebox.showwarning("Fehler", "Bitte eine Blocknummer eingeben.")
         return
 
-    # Setzt den Basis-Pfad (hier: Desktop des aktuellen Benutzers)
-    base_path = os.path.expanduser("~/Desktop")  # z. B. Desktop
+    # Setzt den Basis-Pfad je nach Auswahl
+    if pfad == "GZSZ":
+        base_path = r"W:\Shows\GZSZ"
+    elif pfad == "UU":
+        base_path = r"W:\Shows\UU"
+    else:
+        base_path = os.path.expanduser("~/GZSZ")  # z. B. Desktop
+
     # Erstellt den Namen des Hauptordners mit der Blocknummer
     folder_name = f"Block_{block_number}"
     # Erstellt den vollständigen Pfad zum Hauptordner
     main_folder = os.path.join(base_path, folder_name)
+    # Liste der Unterordner, die erstellt werden sollen
+    subfolders = ["Footage", "Export", "Project", "_ORGA"]
+
     # Prüft, ob der Hauptordner bereits existiert
     if os.path.exists(main_folder):
         messagebox.showinfo("Hinweis", f"Ordner '{folder_name}' bereits vorhanden!")
         root.destroy()
         return
-    # Liste der Unterordner, die erstellt werden sollen
-    subfolders = ["Footage", "Export", "Project", "_ORGA"]
 
     try:
         # Erstellt den Hauptordner (exist_ok=True verhindert Fehler, falls er schon existiert)
@@ -66,12 +74,9 @@ def create_folders():
 
 # GUI erstellen
 root = tk.Tk()  # Erstellt das Hauptfenster der Anwendung
-root.overrideredirect(True)  # Entfernt die Fensterdekoration (nur Dialog sichtbar)
 root.title("Ordnerstruktur erstellen")  # Setzt den Fenstertitel
-
-# Fenstergröße festlegen (z.B. 300x120)
-window_width = 300
-window_height = 120
+window_width = 350
+window_height = 180
 
 # Bildschirmgröße ermitteln
 screen_width = root.winfo_screenwidth()
@@ -90,11 +95,19 @@ tk.Label(root, text="Blocknummer eingeben:").pack(pady=5)
 entry = tk.Entry(root)
 entry.pack(pady=5)
 entry.focus_set()
+
+# Radiobuttons für Pfadauswahl
+pfad_var = tk.StringVar(value="Desktop")
+frame = tk.Frame(root)
+frame.pack(pady=5)
+tk.Radiobutton(frame, text="GZSZ", variable=pfad_var, value="GZSZ").pack(side="left", padx=5)
+tk.Radiobutton(frame, text="UU", variable=pfad_var, value="UU").pack(side="left", padx=5)
+tk.Radiobutton(frame, text="Desktop", variable=pfad_var, value="Desktop").pack(side="left", padx=5)
+
 # Bindet die Enter-Taste an die Funktion create_folders
 entry.bind('<Return>', lambda event: create_folders())
 # Bindet die Escape-Taste an das Beenden der Anwendung
 root.bind('<Escape>', lambda event: root.destroy())
-
 # Erstellt einen Button, der beim Klicken die Funktion create_folders ausführt
 tk.Button(root, text="Ordner erstellen", command=create_folders).pack(pady=10)
 
