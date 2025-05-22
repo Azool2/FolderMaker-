@@ -15,7 +15,7 @@ def run_update():
             import shutil
             shutil.rmtree(tmp_dir)
         # 2. Repo klonen
-        subprocess.check_call([sys.executable, "-m", "git", "clone", repo_url, tmp_dir])
+        subprocess.check_call(["git", "clone", repo_url, tmp_dir])
         # 3. Dateien (außer .git und _update_tmp) ins Hauptverzeichnis kopieren
         import shutil
         for item in os.listdir(tmp_dir):
@@ -34,3 +34,5 @@ def run_update():
         return True, "Update erfolgreich! Bitte die Anwendung neu starten."
     except Exception as e:
         return False, f"Update fehlgeschlagen: {e}"
+    
+    
