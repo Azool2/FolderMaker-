@@ -9,11 +9,11 @@ def start_ui():
         if not block_number:
             messagebox.showwarning("Fehler", "Bitte eine Blocknummer eingeben.")  # Zeigt eine Warnung an, wenn das Feld leer ist
             return
-        # Setzt den Basis-Pfad je nach Auswahl
+        # Setzt den Basis-Pfad je nach Auswahl (jetzt mit Netzwerkpfad)
         if pfad == "GZSZ":
-            base_path = r"W:\\Shows\\GZSZ"
+            base_path = r"\\192.168.3.247\vfx\Shows\GZSZ"
         elif pfad == "UU":
-            base_path = r"W:\\Shows\\UU"
+            base_path = r"\\192.168.3.247\vfx\Shows\UU"
         else:
             base_path = os.path.expanduser("~/Desktop")
         folder_name = f"Block_{block_number}"  # Erstellt den Namen des Hauptordners mit der Blocknummer
@@ -66,21 +66,8 @@ def start_ui():
             messagebox.showerror("Fehler", str(e))  # Zeigt eine Fehlermeldung an, falls etwas schiefgeht
             root.destroy()  # Schließt das Fenster
 
-    def update_action():
-        import importlib.util
-        import os
-        daten_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Daten', 'Update.py')
-        spec = importlib.util.spec_from_file_location('Update', daten_path)
-        update_mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(update_mod)
-        try:
-            success, msg = update_mod.run_update()
-            if success:
-                messagebox.showinfo("Update", msg)
-            else:
-                messagebox.showerror("Update", msg)
-        except Exception as e:
-            messagebox.showerror("Update", f"Update-Fehler: {e}")
+    def info_action():
+        messagebox.showinfo("Info", "Diese Software wurde von Armin Afsharnejat geschrieben.")
 
     root = tk.Tk()  # Erstellt das Hauptfenster der Anwendung
     root.title("Ordnerstruktur erstellen")  # Setzt den Fenstertitel
@@ -105,5 +92,14 @@ def start_ui():
     entry.bind('<Return>', lambda event: create_folders())
     root.bind('<Escape>', lambda event: root.destroy())
     tk.Button(root, text="Ordner erstellen", command=create_folders, bg="#444", fg="white", activebackground="#666", activeforeground="white").pack(pady=10)
-    tk.Button(root, text="Update", command=update_action, bg="#444", fg="white", activebackground="#666", activeforeground="white").pack(pady=5)
+    tk.Button(
+        root,
+        text="Info",
+        command=info_action,
+        bg="#444",
+        fg="white",
+        activebackground="#666",
+        activeforeground="white"
+    ).pack(pady=5)
+
     root.mainloop()  # Startet die GUI und wartet auf Benutzeraktionen
