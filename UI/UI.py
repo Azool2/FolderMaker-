@@ -52,11 +52,35 @@ def start_ui():
             # In Documents: Drehbuch, Excel Tabelen
             for sub in ["Drehbuch", "Excel Tabelen"]:
                 os.makedirs(os.path.join(documents_path, sub), exist_ok=True)
+            # Kopiert PluginDaten.mov in den Done-Ordner
+            try:
+                import shutil
+                src_mov = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Daten", "PluginDaten.mov")
+                dest_mov = os.path.join(footage_path, "Done", "PluginDaten.mov")
+                shutil.copy2(src_mov, dest_mov)
+            except Exception as copy_err:
+                messagebox.showwarning("Warnung", f"PluginDaten.mov konnte nicht kopiert werden: {copy_err}")
             messagebox.showinfo("Erfolg", f"Ordner '{folder_name}' wurde erstellt.")  # Zeigt eine Erfolgsmeldung an
             root.destroy()  # Schließt das Fenster
         except Exception as e:
             messagebox.showerror("Fehler", str(e))  # Zeigt eine Fehlermeldung an, falls etwas schiefgeht
             root.destroy()  # Schließt das Fenster
+
+    def update_action():
+        import importlib.util
+        import os
+        daten_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Daten', 'Update.py')
+        spec = importlib.util.spec_from_file_location('Update', daten_path)
+        update_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(update_mod)
+        try:
+            success, msg = update_mod.run_update()
+            if success:
+                messagebox.showinfo("Update", msg)
+            else:
+                messagebox.showerror("Update", msg)
+        except Exception as e:
+            messagebox.showerror("Update", f"Update-Fehler: {e}")
 
     root = tk.Tk()  # Erstellt das Hauptfenster der Anwendung
     root.title("Ordnerstruktur erstellen")  # Setzt den Fenstertitel
@@ -67,17 +91,19 @@ def start_ui():
     x = int((screen_width / 2) - (window_width / 2))  # X-Position für zentriertes Fenster
     y = int((screen_height / 2) - (window_height / 2))  # Y-Position für zentriertes Fenster
     root.geometry(f"{window_width}x{window_height}+{x}+{y}")  # Positioniert das Fenster mittig
-    tk.Label(root, text="Blocknummer eingeben:").pack(pady=5)  # Label für die Eingabeaufforderung
-    entry = tk.Entry(root)  # Eingabefeld für die Blocknummer
+    root.configure(bg="#2e2e2e")  # Setzt die Hintergrundfarbe auf dunkelgrau
+    tk.Label(root, text="Blocknummer eingeben:", bg="#2e2e2e", fg="white").pack(pady=5)  # Label mit dunklem Hintergrund und weißer Schrift
+    entry = tk.Entry(root)
     entry.pack(pady=5)
-    entry.focus_set()  # Setzt den Fokus auf das Eingabefeld
-    pfad_var = tk.StringVar(value="GZSZ")  # Variable für die Radiobutton-Auswahl, Standard: GZSZ
-    frame = tk.Frame(root)  # Frame für die Radiobuttons
+    entry.focus_set()
+    pfad_var = tk.StringVar(value="GZSZ")
+    frame = tk.Frame(root, bg="#2e2e2e")  # Frame mit dunklem Hintergrund
     frame.pack(pady=5)
-    tk.Radiobutton(frame, text="GZSZ", variable=pfad_var, value="GZSZ").pack(side="left", padx=5)  # Radiobutton GZSZ
-    tk.Radiobutton(frame, text="UU", variable=pfad_var, value="UU").pack(side="left", padx=5)  # Radiobutton UU
-    tk.Radiobutton(frame, text="Desktop", variable=pfad_var, value="Desktop").pack(side="left", padx=5)  # Radiobutton Desktop
-    entry.bind('<Return>', lambda event: create_folders())  # Enter-Taste löst die Funktion aus
-    root.bind('<Escape>', lambda event: root.destroy())  # Escape-Taste schließt das Fenster
-    tk.Button(root, text="Ordner erstellen", command=create_folders).pack(pady=10)  # Button zum Erstellen der Ordner
+    tk.Radiobutton(frame, text="GZSZ", variable=pfad_var, value="GZSZ", bg="#2e2e2e", fg="white", selectcolor="#444").pack(side="left", padx=5)
+    tk.Radiobutton(frame, text="UU", variable=pfad_var, value="UU", bg="#2e2e2e", fg="white", selectcolor="#444").pack(side="left", padx=5)
+    tk.Radiobutton(frame, text="Desktop", variable=pfad_var, value="Desktop", bg="#2e2e2e", fg="white", selectcolor="#444").pack(side="left", padx=5)
+    entry.bind('<Return>', lambda event: create_folders())
+    root.bind('<Escape>', lambda event: root.destroy())
+    tk.Button(root, text="Ordner erstellen", command=create_folders, bg="#444", fg="white", activebackground="#666", activeforeground="white").pack(pady=10)
+    tk.Button(root, text="Update", command=update_action, bg="#444", fg="white", activebackground="#666", activeforeground="white").pack(pady=5)
     root.mainloop()  # Startet die GUI und wartet auf Benutzeraktionen
